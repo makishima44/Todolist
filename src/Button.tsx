@@ -1,10 +1,9 @@
-import React from "react";
 type ButtonPropsType = {
-  title?: string;
-};
+	title: string
+}
 
-const Button = (props: ButtonPropsType) => {
-  return <button>{props.title}</button>;
-};
-
-export default Button;
+export const Button = ({title}: ButtonPropsType) => {
+	return (
+		<button>{title}</button>
+	)
+}
