@@ -1,9 +1,4 @@
-import {
-  ChangeEvent,
-  ChangeEventHandler,
-  KeyboardEvent,
-  useState,
-} from "react";
+import { useRef } from "react";
 import { FilteredVAluesType } from "./App";
 import { Button } from "./Button";
 
@@ -28,7 +23,7 @@ export const Todolist = ({
   changeTodoListFilter,
   addTask,
 }: TasksPropsType) => {
-  const [taskTitle, setTaskTitle] = useState("");
+  const taskTitleINput = useRef<HTMLInputElement>(null);
 
   let tasksList;
   if (tasks.length === 0) {
@@ -37,12 +32,11 @@ export const Todolist = ({
     tasksList = (
       <ul>
         {tasks.map((task: TaskType) => {
-          const removeTaskHandler = () => removeTask(task.id);
           return (
             <li key={task.id}>
               <input type="checkbox" checked={task.isDone} />
               <span>{task.title}</span>
-              <Button title="x" onClickHandler={removeTaskHandler} />
+              <Button title="x" onClickHandler={() => removeTask(task.id)} />
             </li>
           );
         })}
@@ -50,43 +44,18 @@ export const Todolist = ({
     );
   }
 
-  const addNewTaskHandler = () => {
-    addTask(taskTitle);
-    setTaskTitle("");
-  };
-
-  const onkeyDownAddNewTaskHandler = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && e.ctrlKey && isAddTaskPossible) {
-      addNewTaskHandler();
+  const addNewTask = () => {
+    if (taskTitleINput.current) {
+      addTask(taskTitleINput.current.value);
+      taskTitleINput.current.value = "";
     }
   };
-
-  const setTaskTitleHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    setTaskTitle(e.currentTarget.value);
-  };
-
-  const isAddTaskPossible = taskTitle.length && taskTitle.length <= 15;
-
-  const changeTodoListFilterHandlerCreater = (filter: FilteredVAluesType) => {
-    changeTodoListFilter(filter);
-  };
-
   return (
     <div className="todolist">
       <h3>{title}</h3>
       <div>
-        <input
-          value={taskTitle}
-          onKeyDown={onkeyDownAddNewTaskHandler}
-          onChange={setTaskTitleHandler}
-        />
-        <Button
-          title={"+"}
-          onClickHandler={addNewTaskHandler}
-          isDisabled={!isAddTaskPossible}
-        />
-        {!taskTitle.length && <div>Please, enter title</div>}
-        {taskTitle.length > 15 && <div>Task title is too long</div>}
+        <input ref={taskTitleINput} />
+        <Button title={"+"} onClickHandler={addNewTask} />
       </div>
       {tasksList}
       <div>
