@@ -7,9 +7,7 @@ import {
 } from "./todolists-reducer";
 
 export type RemoveTaskActionType = ReturnType<typeof removeTaskAC>;
-
 export type AddTaskActionType = ReturnType<typeof addTaskAC>;
-
 export type ChangeTaskStatusActionType = ReturnType<typeof changeTaskStatusAC>;
 export type ChangeTaskTitleActionType = ReturnType<typeof changeTaskTitleAC>;
 
@@ -21,15 +19,12 @@ type ActionsType =
   | AddTodolistActionType
   | RemoveTodolistActionType;
 
-let todolistID1 = v1();
-let todolistID2 = v1();
+let initialTasksState: TasksStateType = {};
 
-const initialState: TodolistType[] = [
-  { id: todolistID1, title: "What to learn", filter: "all" },
-  { id: todolistID2, title: "What to buy", filter: "all" },
-];
-
-export const tasksReducer = (state: TasksStateType, action: ActionsType) => {
+export const tasksReducer = (
+  state: TasksStateType = initialTasksState,
+  action: ActionsType
+) => {
   switch (action.type) {
     case "REMOVE-TASK": {
       let ff = state[action.todolistId].filter((t) => t.id !== action.taskId);
@@ -82,12 +77,12 @@ export const tasksReducer = (state: TasksStateType, action: ActionsType) => {
     }
 
     default:
-      throw new Error("I don't understand this type");
+      return state;
   }
 };
 
-export const removeTaskAC = (taskId: string, todolistId: string) => {
-  return { type: "REMOVE-TASK", taskId, todolistId } as const;
+export const removeTaskAC = (todolistId: string, taskId: string) => {
+  return { type: "REMOVE-TASK", todolistId, taskId } as const;
 };
 
 export const addTaskAC = (title: string, todolistId: string) => {
@@ -95,17 +90,17 @@ export const addTaskAC = (title: string, todolistId: string) => {
 };
 
 export const changeTaskStatusAC = (
+  todolistId: string,
   taskId: string,
-  isDone: boolean,
-  todolistId: string
+  isDone: boolean
 ) => {
-  return { type: "CHANGE-TASK-STATUS", taskId, isDone, todolistId } as const;
+  return { type: "CHANGE-TASK-STATUS", todolistId, taskId, isDone } as const;
 };
 
 export const changeTaskTitleAC = (
+  todolistId: string,
   taskId: string,
-  title: string,
-  todolistId: string
+  title: string
 ) => {
-  return { type: "CHANGE-TASK-TITLE", taskId, title, todolistId } as const;
+  return { type: "CHANGE-TASK-TITLE", todolistId, taskId, title } as const;
 };
