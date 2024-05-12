@@ -1,62 +1,53 @@
-import Button from "@mui/material/Button";
-import { ChangeEvent, KeyboardEvent, useState } from "react";
-import TextField from "@mui/material/TextField";
-import AddBoxRoundedIcon from "@mui/icons-material/AddBoxRounded";
-import IconButton from "@mui/material/IconButton";
+import TextField from "@mui/material/TextField/TextField";
+import React, { ChangeEvent, KeyboardEvent, memo, useState } from "react";
+import { IconButton } from "@mui/material";
+import { AddBox } from "@mui/icons-material";
 
-type Props = {
+type AddItemFormPropsType = {
   addItem: (title: string) => void;
 };
 
-export const AddItemForm = ({ addItem }: Props) => {
-  const [taskTitle, setTaskTitle] = useState("");
-  const [error, setError] = useState<string | null>(null);
+export const AddItemForm = memo((props: AddItemFormPropsType) => {
 
-  const changeTaskTitleHandler = (event: ChangeEvent<HTMLInputElement>) => {
-    setTaskTitle(event.currentTarget.value);
-  };
+  let [title, setTitle] = useState("");
+  let [error, setError] = useState<string | null>(null);
 
-  const addTaskOnKeyUpHandler = (event: KeyboardEvent<HTMLInputElement>) => {
-    setError(null);
-    if (event.key === "Enter") {
-      addTaskHandler();
+  const addItem = () => {
+    if (title.trim() !== "") {
+      props.addItem(title);
+      setTitle("");
+    } else {
+      setError("Title is required");
     }
   };
 
-  const addTaskHandler = () => {
-    if (taskTitle.trim() !== "") {
-      addItem(taskTitle.trim());
-      setTaskTitle("");
-    } else {
-      setError("Title is required");
+  const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setTitle(e.currentTarget.value);
+  };
+
+  const onKeyPressHandler = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (error) {
+      setError(null);
+    }
+    if (e.charCode === 13) {
+      addItem();
     }
   };
 
   return (
     <div>
       <TextField
-        label="Enter a title"
-        variant={"outlined"}
-        className={error ? "error" : ""}
+        variant="outlined"
         error={!!error}
-        value={taskTitle}
-        size={"small"}
-        onChange={changeTaskTitleHandler}
-        onKeyUp={addTaskOnKeyUpHandler}
+        value={title}
+        onChange={onChangeHandler}
+        onKeyPress={onKeyPressHandler}
+        label="Title"
         helperText={error}
       />
-
-      {/* <Button
-        variant="contained"
-        onClick={addTaskHandler}
-        style={{ background: "black" }}
-      >
-        X
-      </Button> */}
-      <IconButton onClick={addTaskHandler} color="primary">
-        <AddBoxRoundedIcon />
+      <IconButton color="primary" onClick={addItem}>
+        <AddBox />
       </IconButton>
-      {/* {error && <div className={"error-message"}>{error}</div>} */}
     </div>
   );
-};
+});

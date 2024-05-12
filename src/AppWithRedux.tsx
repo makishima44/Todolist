@@ -1,40 +1,37 @@
-import { AddItemForm } from "./AddItemForm";
+import React, { useCallback, useReducer, useState } from "react";
 import "./App.css";
-import { useState } from "react";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
-import { filterButtonContainerSX } from "./Todolist.styles";
-import { MenuButton } from "./MenuButton";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Switch from "@mui/material/Switch";
-import CssBaseline from "@mui/material/CssBaseline";
+import { TaskType, Todolist } from "./Todolist";
+import { v1 } from "uuid";
+import { AddItemForm } from "./AddItemForm";
 import {
   addTodolistAC,
-  changeFilterAC,
+  changeTodolistFilterAC,
+  changeTodolistTitleAC,
   removeTodolistAC,
-  updateTodolistTitleAC,
-} from "./model/todolists-reducer";
+  todolistsReducer,
+} from "./state/todolists-reducer";
 import {
   addTaskAC,
   changeTaskStatusAC,
   changeTaskTitleAC,
   removeTaskAC,
-} from "./model/tasks-reducer";
+  tasksReducer,
+} from "./state/tasks-reducer";
 import { useDispatch, useSelector } from "react-redux";
-import { AppRootStateType } from "./model/store";
-import { TodolistWithRedux } from "./TodolistWithRedux";
+import { AppRootStateType } from "./state/store";
+import {
+  AppBar,
+  Button,
+  Container,
+  Grid,
+  IconButton,
+  Paper,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import { Menu } from "@mui/icons-material";
 
-export type TaskType = {
-  id: string;
-  title: string;
-  isDone: boolean;
-};
-
+export type FilterValuesType = "all" | "active" | "completed";
 export type TodolistType = {
   id: string;
   title: string;
@@ -45,117 +42,124 @@ export type TasksStateType = {
   [key: string]: Array<TaskType>;
 };
 
-export type FilterValuesType = "all" | "active" | "completed";
-
-type ThemeMode = "dark" | "light";
-
 function AppWithRedux() {
-  //----------------------------------------------------------------------------------------------------//
+  let todolistId1 = v1();
+  let todolistId2 = v1();
 
-  const [themeMode, setThemeMode] = useState<ThemeMode>("light");
-
-  const theme = createTheme({
-    palette: {
-      mode: themeMode === "light" ? "light" : "dark",
-      primary: {
-        main: "#087EA4",
-      },
-    },
-  });
-
-  const changeModeHandler = () => {
-    setThemeMode(themeMode === "light" ? "dark" : "light");
-  };
-
-  //----------------------------------------------------------------------------------------------------//
-
-  let todolists = useSelector<AppRootStateType, Array<TodolistType>>(
+  const todolists = useSelector<AppRootStateType, Array<TodolistType>>(
     (state) => state.todolists
   );
+  const tasks = useSelector<AppRootStateType, TasksStateType>(
+    (state) => state.tasks
+  );
+  const dispatch = useDispatch();
 
-  let dispatch = useDispatch();
+  const removeTask = useCallback(
+    (id: string, todolistId: string) => {
+      const action = removeTaskAC(id, todolistId);
+      dispatch(action);
+    },
+    [dispatch]
+  );
 
-  //------------------------------------------------------------------------//
+  const addTask = useCallback(
+    (title: string, todolistId: string) => {
+      const action = addTaskAC(title, todolistId);
+      dispatch(action);
+    },
+    [dispatch]
+  );
 
-  const removeTask = (todolistID: string, taskId: string) => {
-    dispatch(removeTaskAC(todolistID, taskId));
-  };
+  const changeStatus = useCallback(
+    (id: string, isDone: boolean, todolistId: string) => {
+      const action = changeTaskStatusAC(id, isDone, todolistId);
+      dispatch(action);
+    },
+    [dispatch]
+  );
 
-  const addTask = (title: string, todolistID: string) => {
-    dispatch(addTaskAC(title, todolistID));
-  };
+  const changeTaskTitle = useCallback(
+    (id: string, newTitle: string, todolistId: string) => {
+      const action = changeTaskTitleAC(id, newTitle, todolistId);
+      dispatch(action);
+    },
+    [dispatch]
+  );
 
-  const updateTaskTitle = (
-    todolistID: string,
-    taskId: string,
-    newTitle: string
-  ) => {
-    dispatch(changeTaskTitleAC(todolistID, taskId, newTitle));
-  };
+  const changeFilter = useCallback(
+    (value: FilterValuesType, todolistId: string) => {
+      const action = changeTodolistFilterAC(todolistId, value);
+      dispatch(action);
+    },
+    [dispatch]
+  );
 
-  const changeTaskStatus = (
-    todolistID: string,
-    taskId: string,
-    taskStatus: boolean
-  ) => {
-    dispatch(changeTaskStatusAC(todolistID, taskId, taskStatus));
-  };
+  const removeTodolist = useCallback(
+    (id: string) => {
+      const action = removeTodolistAC(id);
+      dispatch(action);
+    },
+    [dispatch]
+  );
 
-  const removeTodolist = (todolistID: string) => {
-    dispatch(removeTodolistAC(todolistID));
-  };
+  const changeTodolistTitle = useCallback(
+    (id: string, title: string) => {
+      const action = changeTodolistTitleAC(id, title);
+      dispatch(action);
+    },
+    [dispatch]
+  );
 
-  const addTodolist = (title: string) => {
-    dispatch(addTodolistAC(title));
-  };
-
-  const changeFilter = (todolistID: string, newFilter: FilterValuesType) => {
-    dispatch(changeFilterAC(todolistID, newFilter));
-  };
-
-  const updateTodolistTitle = (todolistID: string, newTitle: string) => {
-    dispatch(updateTodolistTitleAC(todolistID, newTitle));
-  };
+  const addTodolist = useCallback(
+    (title: string) => {
+      const action = addTodolistAC(title);
+      dispatch(action);
+    },
+    [dispatch]
+  );
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AppBar position="static" sx={{ mb: "30px" }}>
-        <Toolbar sx={filterButtonContainerSX}>
-          <IconButton color="inherit">
-            <MenuIcon />
+    <div className="App">
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton edge="start" color="inherit" aria-label="menu">
+            <Menu />
           </IconButton>
-          <div>
-            <MenuButton background={theme.palette.primary.dark}>
-              Login
-            </MenuButton>
-            <MenuButton background={theme.palette.primary.dark}>
-              Logout
-            </MenuButton>
-            <MenuButton background={theme.palette.primary.light}>
-              Faq
-            </MenuButton>
-            <Switch onChange={changeModeHandler} color={"default"} />
-          </div>
+          <Typography variant="h6">News</Typography>
+          <Button color="inherit">Login</Button>
         </Toolbar>
       </AppBar>
       <Container fixed>
-        <Grid container sx={{ mb: "30px" }}>
+        <Grid container style={{ padding: "20px" }}>
           <AddItemForm addItem={addTodolist} />
         </Grid>
-        <Grid container>
-          {todolists.map((el) => {
+        <Grid container spacing={3}>
+          {todolists.map((tl) => {
+           
+
             return (
-              <Grid key={el.id} item sx={{ mr: "30px" }}>
-                <Paper elevation={3} sx={{ p: "20px" }}>
-                  <TodolistWithRedux todolist={el} />
+              <Grid item key={tl.id}>
+                <Paper style={{ padding: "10px" }}>
+                  <Todolist
+                    id={tl.id}
+                    title={tl.title}
+                    tasks={tasks[tl.id]}
+                    removeTask={removeTask}
+                    changeFilter={changeFilter}
+                    addTask={addTask}
+                    changeTaskStatus={changeStatus}
+                    filter={tl.filter}
+                    removeTodolist={removeTodolist}
+                    changeTaskTitle={changeTaskTitle}
+                    changeTodolistTitle={changeTodolistTitle}
+                  />
                 </Paper>
               </Grid>
             );
           })}
         </Grid>
       </Container>
-    </ThemeProvider>
+    </div>
   );
 }
 
