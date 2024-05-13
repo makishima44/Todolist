@@ -5,6 +5,7 @@ import { EditableSpan } from "./EditableSpan";
 import { Button, ButtonProps, Checkbox, IconButton } from "@mui/material";
 import { Delete } from "@mui/icons-material";
 import { Task } from "./Task";
+import { TaskWithRedux } from "./TaskWithRedux";
 
 export type TaskType = {
   id: string;
@@ -85,16 +86,7 @@ export const Todolist = memo((props: PropsType) => {
       <AddItemForm addItem={addTask} />
       <div>
         {tasks.map((t) => {
-          return (
-            <Task
-              key={t.id}
-              task={t}
-              todolistId={props.id}
-              changeTaskTitle={props.changeTaskTitle}
-              changeTaskStatus={props.changeTaskStatus}
-              removeTask={props.removeTask}
-            />
-          );
+          return <TaskWithRedux key={t.id} task={t} todolistId={props.id} />;
         })}
       </div>
       <div style={{ paddingTop: "10px" }}>
