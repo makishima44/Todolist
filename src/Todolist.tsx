@@ -86,7 +86,16 @@ export const Todolist = memo((props: PropsType) => {
       <AddItemForm addItem={addTask} />
       <div>
         {tasks.map((t) => {
-          return <TaskWithRedux key={t.id} task={t} todolistId={props.id} />;
+          return (
+            <Task
+              key={t.id}
+              task={t}
+              todolistId={props.id}
+              changeTaskStatus={props.changeTaskStatus}
+              changeTaskTitle={props.changeTaskTitle}
+              removeTask={props.removeTask}
+            />
+          );
         })}
       </div>
       <div style={{ paddingTop: "10px" }}>
