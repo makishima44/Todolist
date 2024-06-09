@@ -35,6 +35,27 @@ export const todolistApi = {
       title,
     });
   },
+
+  getTasks: (todolistId: string) => {
+    return instance.get<GetTasksType>(`/todo-lists/${todolistId}/tasks`);
+  },
+
+  createTask: (todolistId: string, taskTitle: string) => {
+    return instance.post<ResponceType<TaskType>>(
+      `todo-lists/${todolistId}/tasks`,
+      { title: taskTitle }
+    );
+  },
+
+  deleteTask: (todolistId: string, taskId: string) => {
+    return instance.delete<ResponceType>(
+      `todo-lists/${todolistId}/tasks/${taskId}`
+    );
+  },
+
+  updateTask: (todolistId: string, taskId: string, model: UpdateTaskType) => {
+    return instance.put(`todo-lists/${todolistId}/tasks/${taskId}`, model);
+  },
 };
 
 export type TodoLostType = {
@@ -46,7 +67,37 @@ export type TodoLostType = {
 
 type ResponceType<T = {}> = {
   data: T;
-  fieldsErrors: [];
+  fieldsErrors?: [];
   messages: [];
-  resultCode: 0;
+  resultCode: number;
+};
+
+export type GetTasksType = {
+  items: TaskType[];
+  totalCount: number;
+  error: string | null;
+};
+
+export type UpdateTaskType = {
+  title: string;
+  description: string;
+  completed: boolean;
+  status: number;
+  priority: number;
+  startDate: string;
+  deadline: string;
+};
+
+export type TaskType = {
+  description: string;
+  title: string;
+  completed: boolean;
+  status: number;
+  priority: number;
+  startDate: string;
+  deadline: string;
+  id: string;
+  todoListId: string;
+  order: number;
+  addedDate: string;
 };
