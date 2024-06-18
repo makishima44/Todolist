@@ -212,10 +212,11 @@ export const updateTaskTC = (
         deadline: task.deadline,
         status,
       };
-    }
 
-    todolistsAPI.updateTask(todoId, taskId, model).then((res) => {
-      dispatch(changeTaskStatusAC(taskId, status, todoId));
-    });
+      todolistsAPI.updateTask(todoId, taskId, model).then((res) => {
+        dispatch(changeTaskStatusAC(taskId, status, todoId));
+      });
+    }
   };
 };
+ 
