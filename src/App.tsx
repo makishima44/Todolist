@@ -15,6 +15,9 @@ import {
   addTodolistAC,
   changeTodolistFilterAC,
   changeTodolistTitleAC,
+  changeTodosTitleTC,
+  createTodosTC,
+  deleteTodosTC,
   FilterValuesType,
   getTodosTC,
   removeTodolistAC,
@@ -84,18 +87,18 @@ function App() {
   []);
 
   const removeTodolist = useCallback(function (id: string) {
-    const action = removeTodolistAC(id);
+    const action = deleteTodosTC(id);
     dispatch(action);
   }, []);
 
   const changeTodolistTitle = useCallback(function (id: string, title: string) {
-    const action = changeTodolistTitleAC(id, title);
+    const action = changeTodosTitleTC(id, title);
     dispatch(action);
   }, []);
 
   const addTodolist = useCallback(
     (title: string) => {
-      const action = addTodolistAC(title);
+      const action = createTodosTC(title);
       dispatch(action);
     },
     [dispatch]

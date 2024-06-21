@@ -2,6 +2,7 @@ import { v1 } from "uuid";
 import { TodolistType, todolistsAPI } from "../api/todolists-api";
 import { AnyPtrRecord } from "dns";
 import { Dispatch } from "redux";
+import { removeTaskAC } from "./tasks-reducer";
 
 export type RemoveTodolistActionType = {
   type: "REMOVE-TODOLIST";
@@ -95,8 +96,14 @@ export const removeTodolistAC = (
   return { type: "REMOVE-TODOLIST", id: todolistId };
 };
 
-export const addTodolistAC = (title: string): AddTodolistActionType => {
-  return { type: "ADD-TODOLIST", title: title, todolistId: v1() };
+export const addTodolistAC = (
+  todolist: TodolistType
+): AddTodolistActionType => {
+  return {
+    type: "ADD-TODOLIST",
+    title: todolist.title,
+    todolistId: todolist.id,
+  };
 };
 
 export const changeTodolistTitleAC = (
@@ -123,6 +130,30 @@ export const getTodosTC = () => {
   return (dispatch: Dispatch) => {
     todolistsAPI.getTodolists().then((res) => {
       dispatch(setTodosAC(res.data));
+    });
+  };
+};
+
+export const createTodosTC = (title: string) => {
+  return (dispatch: Dispatch) => {
+    todolistsAPI.createTodolist(title).then((res) => {
+      dispatch(addTodolistAC(res.data.data.item));
+    });
+  };
+};
+
+export const deleteTodosTC = (todolistId: string) => {
+  return (dispatch: Dispatch) => {
+    todolistsAPI.deleteTodolist(todolistId).then((res) => {
+      dispatch(removeTodolistAC(todolistId));
+    });
+  };
+};
+
+export const changeTodosTitleTC = (id: string, title: string) => {
+  return (dispatch: Dispatch) => {
+    todolistsAPI.updateTodolist(id, title).then((res) => {
+      dispatch(changeTodolistTitleAC(id, title));
     });
   };
 };
