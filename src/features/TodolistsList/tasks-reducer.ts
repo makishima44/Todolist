@@ -14,6 +14,7 @@ import {
 import { Dispatch } from "redux";
 import { AppRootStateType } from "../../app/store";
 import {
+  RequestStatusType,
   SetAppStatusType,
   SetErrorType,
   setAppStatusAC,
@@ -23,6 +24,7 @@ import {
   handleServerAppError,
   handleServerNetworkError,
 } from "../../utils/error-utils";
+import axios, { AxiosError } from "axios";
 
 const initialState: TasksStateType = {};
 
@@ -105,23 +107,33 @@ export const fetchTasksTC =
   };
 
 export const removeTaskTC =
-  (taskId: string, todolistId: string) => (dispatch: Dispatch<ActionsType>) => {
+  (taskId: string, todolistId: string) =>
+  async (dispatch: Dispatch<ActionsType>) => {
     dispatch(setAppStatusAC("loading"));
-    todolistsAPI
-      .deleteTask(todolistId, taskId)
-      .then((res) => {
-        if (res.data.resultCode === STATUS_CODE.SUCCESS) {
-          const action = removeTaskAC(taskId, todolistId);
-          dispatch(action);
-          dispatch(setAppStatusAC("succeeded"));
-        } else {
-          handleServerAppError(dispatch, res.data);
-        }
-      })
-      .catch((error) => {
-        handleServerNetworkError(dispatch, error.message);
-      });
+
+    try {
+      const res = await todolistsAPI.deleteTask(todolistId, taskId);
+      if (res.data.resultCode === STATUS_CODE.SUCCESS) {
+        const action = removeTaskAC(taskId, todolistId);
+        dispatch(action);
+        dispatch(setAppStatusAC("succeeded"));
+      } else {
+        handleServerAppError(dispatch, res.data);
+      }
+    } catch (e) {
+      if (axios.isAxiosError<ErrorType>(e)) {
+        e.response?.data.message;
+        handleServerNetworkError(dispatch, e);
+      } else {
+      }
+    }
   };
+
+type ErrorType = {
+  statusCode: number;
+  message: string;
+  error: string;
+};
 
 export const addTaskTC =
   (title: string, todolistId: string) => (dispatch: Dispatch<ActionsType>) => {
@@ -138,8 +150,8 @@ export const addTaskTC =
           handleServerAppError(dispatch, res.data);
         }
       })
-      .catch((error) => {
-        handleServerNetworkError(dispatch, error.message);
+      .catch((error: AxiosError<ErrorType>) => {
+        handleServerNetworkError(dispatch, error.response?.data!);
       });
   };
 
@@ -192,7 +204,10 @@ export type UpdateDomainTaskModelType = {
 };
 export type TasksStateType = {
   [key: string]: Array<TaskType>;
+} & {
+  entityStatus?: RequestStatusType;
 };
+
 type ActionsType =
   | ReturnType<typeof removeTaskAC>
   | ReturnType<typeof addTaskAC>

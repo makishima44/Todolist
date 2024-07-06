@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { AddItemForm } from "../../../components/AddItemForm/AddItemForm";
 import { EditableSpan } from "../../../components/EditableSpan/EditableSpan";
 import { Task } from "./Task/Task";
@@ -109,6 +109,7 @@ export const Todolist = React.memo(function (props: PropsType) {
             removeTask={props.removeTask}
             changeTaskTitle={props.changeTaskTitle}
             changeTaskStatus={props.changeTaskStatus}
+            entityStatus={props.entityStatus}
           />
         ))}
       </div>
