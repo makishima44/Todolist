@@ -1,7 +1,8 @@
 import { Dispatch } from 'redux';
-import { authAPI } from '../api/todolists-api';
+
 import { setIsLoggedIn } from '../features/Login/authSlice';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { authAPI } from 'features/auth/authApi';
 
 export type RequestStatusType = 'idle' | 'loading' | 'succeeded' | 'failed';
 
