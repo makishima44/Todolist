@@ -1,7 +1,9 @@
 import {
+  addTodolist,
   changeTodolistTitle,
   fetchTodos,
   FilterValuesType,
+  removeTodolist,
   TodolistDomainType,
   todolistsActions,
   todolistsReducer,
@@ -26,7 +28,12 @@ beforeEach(() => {
 });
 
 test('correct todolist should be removed', () => {
-  const endState = todolistsReducer(startState, todolistsActions.removeTodolist({ id: todolistId1 }));
+  const action: TestAction<typeof removeTodolist.fulfilled> = {
+    type: removeTodolist.fulfilled.type,
+    payload: { id: todolistId1 },
+  };
+
+  const endState = todolistsReducer(startState, action);
 
   expect(endState.length).toBe(1);
   expect(endState[0].id).toBe(todolistId2);
@@ -40,8 +47,12 @@ test('correct todolist should be added', () => {
     order: 0,
   };
 
-  const endState = todolistsReducer(startState, todolistsActions.addTodolist({ todolist }));
+  const action: TestAction<typeof addTodolist.fulfilled> = {
+    type: addTodolist.fulfilled.type,
+    payload: { todolist },
+  };
 
+  const endState = todolistsReducer(startState, action);
   expect(endState.length).toBe(3);
   expect(endState[0].title).toBe(todolist.title);
   expect(endState[0].filter).toBe('all');

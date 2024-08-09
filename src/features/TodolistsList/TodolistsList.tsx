@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import {
-  addTodolistTC,
+  addTodolist,
   changeTodolistTitle,
   fetchTodos,
   FilterValuesType,
-  removeTodolistTC,
+  removeTodolist,
   todolistsActions,
 } from 'features/TodolistsList/todolists.reducer';
 import { addTask, removeTask, updateTask } from 'features/TodolistsList/tasks.reducer';
@@ -62,19 +62,17 @@ export const TodolistsList: React.FC<PropsType> = ({ demo = false }) => {
     dispatch(todolistsActions.changeTodolistFilter({ id, filter }));
   }, []);
 
-  const removeTodolist = useCallback(function (id: string) {
-    const thunk = removeTodolistTC(id);
-    dispatch(thunk);
+  const removeTodolistCallback = useCallback(function (id: string) {
+    dispatch(removeTodolist({ id }));
   }, []);
 
   const changeTodolistTitleCallback = useCallback(function (id: string, title: string) {
     dispatch(changeTodolistTitle({ id, title }));
   }, []);
 
-  const addTodolist = useCallback(
+  const addTodolistCallback = useCallback(
     (title: string) => {
-      const thunk = addTodolistTC(title);
-      dispatch(thunk);
+      dispatch(addTodolist({ title }));
     },
     [dispatch],
   );
@@ -86,7 +84,7 @@ export const TodolistsList: React.FC<PropsType> = ({ demo = false }) => {
   return (
     <>
       <Grid container style={{ padding: '20px' }}>
-        <AddItemForm addItem={addTodolist} />
+        <AddItemForm addItem={addTodolistCallback} />
       </Grid>
       <Grid container spacing={3}>
         {todolists.map((tl) => {
@@ -102,7 +100,7 @@ export const TodolistsList: React.FC<PropsType> = ({ demo = false }) => {
                   changeFilter={changeFilter}
                   addTask={addTaskCallback}
                   changeTaskStatus={changeStatus}
-                  removeTodolist={removeTodolist}
+                  removeTodolist={removeTodolistCallback}
                   changeTaskTitle={changeTaskTitle}
                   changeTodolistTitle={changeTodolistTitleCallback}
                   demo={demo}

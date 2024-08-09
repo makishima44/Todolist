@@ -1,5 +1,3 @@
-
-
 import { appActions } from 'app/app.reducer';
 import { todolistsActions, todosThunks } from 'features/TodolistsList/todolists.reducer';
 import { createSlice } from '@reduxjs/toolkit';
@@ -7,7 +5,14 @@ import { clearTasksAndTodolists } from 'common/actions/common.actions';
 import { createAppAsyncThunk } from 'common/utils/createAppAsyncThunk';
 import { handleServerNetworkError } from 'common/utils/handleServerNetworkError';
 import { handleServerAppError } from 'common/utils/handleServerAppError';
-import { AddTaskArgs, DeleteTaskArgs, TaskType, todolistsAPI, UpdateTaskArgs, UpdateTaskModelType } from './todolists-api';
+import {
+  AddTaskArgs,
+  DeleteTaskArgs,
+  TaskType,
+  todolistsAPI,
+  UpdateTaskArgs,
+  UpdateTaskModelType,
+} from './todolists-api';
 import { ResultCode, TaskPriorities, TaskStatuses } from 'common/enums/enums';
 
 const initialState: TasksStateType = {};
@@ -41,18 +46,19 @@ const slice = createSlice({
         }
       })
 
-      .addCase(todolistsActions.addTodolist, (state, action) => {
-        state[action.payload.todolist.id] = [];
-      })
-
-      .addCase(todolistsActions.removeTodolist, (state, action) => {
-        delete state[action.payload.id];
-      })
-
       .addCase(todosThunks.fetchTodos.fulfilled, (state, action) => {
         action.payload.todolists.forEach((tl) => {
           state[tl.id] = [];
         });
+      })
+
+      .addCase(todosThunks.addTodolist.fulfilled, (state, action) => {
+        const tl = action.payload.todolist;
+        state[tl.id] = [];
+      })
+
+      .addCase(todosThunks.removeTodolist.fulfilled, (state, action) => {
+        delete state[action.payload.id];
       })
 
       .addCase(clearTasksAndTodolists, () => {

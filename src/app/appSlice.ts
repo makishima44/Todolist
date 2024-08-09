@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux';
 
-import { setIsLoggedIn } from '../features/Login/authSlice';
+
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { authAPI } from 'features/auth/authApi';
 
@@ -46,3 +46,7 @@ export const { setAppError, setAppStatus, setAppInitialized } = slice.actions;
 export const { selectError, selectIsInitialized, selectStatus } = slice.selectors;
 
 export type AppInitialState = ReturnType<typeof slice.getInitialState>;
+function setIsLoggedIn(arg0: { isLoggedIn: boolean; }): any {
+  throw new Error('Function not implemented.');
+}
+

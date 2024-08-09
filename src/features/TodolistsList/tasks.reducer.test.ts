@@ -7,7 +7,7 @@ import {
   updateTask,
 } from 'features/TodolistsList/tasks.reducer';
 
-import { fetchTodos, todolistsActions } from 'features/TodolistsList/todolists.reducer';
+import { addTodolist, fetchTodos, removeTodolist, todolistsActions } from 'features/TodolistsList/todolists.reducer';
 import { TestAction } from 'common/types/types';
 import { TaskPriorities, TaskStatuses } from 'common/enums/enums';
 
@@ -185,14 +185,17 @@ test('correct task should be deleted from correct array', () => {
 });
 
 test('new array should be added when new todolist is added', () => {
-  const action = todolistsActions.addTodolist({
-    todolist: {
-      id: 'blabla',
-      title: 'new todolist',
-      order: 0,
-      addedDate: '',
+  const action = {
+    type: addTodolist.fulfilled.type,
+    payload: {
+      todolist: {
+        id: 'blabla',
+        title: 'new todolist',
+        order: 0,
+        addedDate: '',
+      },
     },
-  });
+  };
 
   const endState = tasksReducer(startState, action);
 
@@ -207,7 +210,10 @@ test('new array should be added when new todolist is added', () => {
 });
 
 test('propertry with todolistId should be deleted', () => {
-  const action = todolistsActions.removeTodolist({ id: 'todolistId2' });
+  const action: TestAction<typeof removeTodolist.fulfilled> = {
+    type: removeTodolist.fulfilled.type,
+    payload: { id: 'todolistId2' },
+  };
 
   const endState = tasksReducer(startState, action);
 
